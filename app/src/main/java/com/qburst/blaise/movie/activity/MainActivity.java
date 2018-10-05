@@ -12,14 +12,19 @@ import android.support.v7.app.AppCompatActivity;
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.fragment.SlidePageFragment;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
+
+    public Set<Integer> fav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        fav = new HashSet<Integer>();
         ViewPager viewPager = findViewById(R.id.viewpager);
         viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
 

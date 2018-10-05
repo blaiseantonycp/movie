@@ -1,5 +1,6 @@
 package com.qburst.blaise.movie.network;
 
+import com.qburst.blaise.movie.models.Movie;
 import com.qburst.blaise.movie.models.MovieResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -15,5 +16,5 @@ public interface ApiInterface {
     Call<MovieResponse> getPopularMovies(@Query("api_key") String apiKey);
 
     @GET("movie/{id}")
-    Call<MovieResponse> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);
+    Call<Movie> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);
 }

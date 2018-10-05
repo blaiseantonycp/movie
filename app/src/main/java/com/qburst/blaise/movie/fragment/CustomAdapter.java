@@ -19,6 +19,7 @@ import com.qburst.blaise.movie.activity.MovieViewActivity;
 import com.qburst.blaise.movie.models.Movie;
 
 import java.util.List;
+import java.util.Set;
 
 import static android.support.v7.content.res.AppCompatResources.getDrawable;
 
@@ -44,11 +45,9 @@ class CustomAdapter extends RecyclerView.Adapter <CustomAdapter.MovieHolder>{
     public void onBindViewHolder(@NonNull MovieHolder movieHolder, int i) {
         final int j = i;
         movieHolder.textView.setText(movies.get(i).getTitle());
-        Glide.with(context).load("http://image.tmdb.org/t/p/w185"+movies.get(i).getPosterPath())
-                .apply(new RequestOptions().
-                        placeholder(getDrawable(context, android.R.drawable.ic_menu_gallery))
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true)).into(movieHolder.imageView);
+        Glide.with(context).load("http://image.tmdb.org/t/p/w185"+movies.get(i).
+                getPosterPath()).apply(new RequestOptions().placeholder(getDrawable(context,
+                android.R.drawable.ic_menu_gallery))).into(movieHolder.imageView);
 
         movieHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override

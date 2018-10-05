@@ -20,7 +20,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MovieViewActivity" />
+        <activity android:name=".activity.MovieViewActivity"
+            android:theme="@style/AppThemeNoActionBar"/>
     </application>
 
 </manifest>
