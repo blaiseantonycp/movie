@@ -17,18 +17,21 @@ import com.qburst.blaise.movie.models.Movie;
 import com.qburst.blaise.movie.network.ApiClient;
 import com.qburst.blaise.movie.network.ApiInterface;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.qburst.blaise.movie.activity.MainActivity.pref;
+import static com.qburst.blaise.movie.fragment.SlidePageFragment.API_KEY;
+
 public class MovieViewActivity extends Activity {
 
-    private String API_KEY = "ff85648a7658698ee49eca272f7076a3";
-    private int id= 0;
-    private SharedPreferences pref;
+    private String id;
     private ImageButton imageButton;
+    private Set<String> favourite;
 
 
     @Override
@@ -37,9 +40,9 @@ public class MovieViewActivity extends Activity {
         setContentView(R.layout.activity_movie);
 
         imageButton = findViewById(R.id.imageButton2);
-        pref = this.getSharedPreferences("Fav",MODE_PRIVATE);
+        favourite = pref.getStringSet("favSet",new HashSet<String>());
 
-        id =Integer.parseInt(getIntent().getStringExtra("id"));
+        id = getIntent().getStringExtra("id");
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<Movie> call = apiService.getMovieDetails(id,API_KEY);
         call.enqueue(new Callback<Movie>() {
@@ -50,7 +53,7 @@ public class MovieViewActivity extends Activity {
                 Glide.with(MovieViewActivity.this).
                         load("http://image.tmdb.org/t/p/w300"+movie.getBackdropPath())
                         .apply(new RequestOptions()).into(imageView);
-                boolean fav = pref.getBoolean(String.valueOf(id), false);
+                boolean fav = pref.getBoolean(id, false);
                 if(fav) {
                     imageButton.setImageDrawable(getResources().
                             getDrawable(android.R.drawable.star_big_on));
@@ -72,7 +75,6 @@ public class MovieViewActivity extends Activity {
 
             @Override
             public void onFailure(Call<Movie> call, Throwable t) {
-
             }
         });
     }
@@ -83,22 +85,33 @@ public class MovieViewActivity extends Activity {
     }
 
     public void toggleFavButton(View view) {
-
-        if(id != 0) {
+        if(id != null) {
             boolean fav = pref.getBoolean(String.valueOf(id), false);
+            favourite = pref.getStringSet("favSet",new HashSet<String>());
             if(fav) {
                 imageButton.setImageDrawable(getResources().
                         getDrawable(android.R.drawable.star_big_off));
+                favourite.remove(id);
+                Log.e("hi", String.valueOf(favourite));
                 SharedPreferences.Editor editor = pref.edit();
-                editor.putBoolean(String.valueOf(id),false).apply();
+                editor.putBoolean(id,false).apply();
             }
             else {
                 imageButton.setImageDrawable(getResources().
                         getDrawable(android.R.drawable.star_big_on));
+                favourite.add(id);
+                Log.e("hi", String.valueOf(favourite));
                 SharedPreferences.Editor editor = pref.edit();
-                editor.putBoolean(String.valueOf(id),true).apply();
+                editor.putBoolean(id, true).apply();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putStringSet("favSet",favourite).apply();
     }
 
     public void back(View view) {

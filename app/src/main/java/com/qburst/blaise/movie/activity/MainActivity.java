@@ -1,5 +1,6 @@
 package com.qburst.blaise.movie.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -17,14 +18,14 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    public Set<Integer> fav;
+    public static SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pref = this.getSharedPreferences("Fav",MODE_PRIVATE);
 
-        fav = new HashSet<Integer>();
         ViewPager viewPager = findViewById(R.id.viewpager);
         viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
 
