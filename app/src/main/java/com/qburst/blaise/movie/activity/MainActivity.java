@@ -13,12 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.fragment.SlidePageFragment;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class MainActivity extends AppCompatActivity {
 
     public static SharedPreferences pref;
+    public static int currentTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +29,24 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                currentTab = tab.getPosition();
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
     }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {

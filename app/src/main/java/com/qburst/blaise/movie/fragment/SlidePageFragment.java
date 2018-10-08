@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,23 +13,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qburst.blaise.movie.R;
-import com.qburst.blaise.movie.activity.MovieViewActivity;
 import com.qburst.blaise.movie.models.Movie;
 import com.qburst.blaise.movie.models.MovieResponse;
 import com.qburst.blaise.movie.network.ApiClient;
 import com.qburst.blaise.movie.network.ApiInterface;
-import com.qburst.blaise.movie.supportclass.FavouriteList;
 
 import java.util.List;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.qburst.blaise.movie.activity.MainActivity.currentTab;
+
 public class SlidePageFragment extends Fragment {
 
     public static String API_KEY = "ff85648a7658698ee49eca272f7076a3";
+    private View v;
 
     public static Fragment newInstance(int i) {
         SlidePageFragment sf = new SlidePageFragment();
@@ -47,15 +48,12 @@ public class SlidePageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
 
+        this.v = view;
         assert savedInstanceState != null;
         Bundle bundle = getArguments();
         int i = bundle.getInt("position");
         if (i == 2) {
-            List<Movie> movies = new FavouriteList().getFavouriteMovies();
-            RecyclerView recyclerView = view.findViewById(R.id.recycler);
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
-            CustomAdapter adapter = new CustomAdapter(getContext(),movies);
-            recyclerView.setAdapter(adapter);
+            new FavouriteList().getFavouriteMovies(view, getContext());
         }
         else {
             ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
