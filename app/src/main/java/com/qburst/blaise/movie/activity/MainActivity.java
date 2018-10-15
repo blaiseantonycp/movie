@@ -8,7 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.fragment.SlidePageFragment;
@@ -16,7 +18,10 @@ import com.qburst.blaise.movie.fragment.SlidePageFragment;
 public class MainActivity extends AppCompatActivity {
 
     public static SharedPreferences pref;
-    public static int currentTab;
+    private int currentTab;
+    private ViewPager viewPager;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ViewPagerAdapter v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,8 +29,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         pref = this.getSharedPreferences("Fav",MODE_PRIVATE);
 
-        ViewPager viewPager = findViewById(R.id.viewpager);
-        viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        viewPager = findViewById(R.id.viewpager);
+        v = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(v);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
@@ -44,6 +50,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
 
+            }
+        });
+        swipeRefreshLayout = findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                int c = currentTab;
+                viewPager.setAdapter(v);
+                viewPager.setCurrentItem(c);
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
 
