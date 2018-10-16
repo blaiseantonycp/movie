@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,32 +12,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.qburst.blaise.movie.R;
-import com.qburst.blaise.movie.activity.MainActivity;
 import com.qburst.blaise.movie.activity.MovieViewActivity;
-import com.qburst.blaise.movie.models.CustomEvents;
-import com.qburst.blaise.movie.models.GlobalBus;
 import com.qburst.blaise.movie.models.Movie;
-import com.qburst.blaise.movie.models.MovieResponse;
-import com.qburst.blaise.movie.network.ApiClient;
-import com.qburst.blaise.movie.network.ApiInterface;
 
 import java.util.List;
-import java.util.Set;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.support.v7.content.res.AppCompatResources.getDrawable;
-import static com.qburst.blaise.movie.activity.MainActivity.popularPage;
-import static com.qburst.blaise.movie.activity.MainActivity.topRatedPage;
-import static com.qburst.blaise.movie.fragment.SlidePageFragment.API_KEY;
 
 class CustomAdapter extends RecyclerView.Adapter <CustomAdapter.MovieHolder>{
 
+    public static final int TYPE_FOOTER = 2;
+    public static final int TYPE_ITEM = 1;
     private Context context;
     private List<Movie> movies;
     private int pageIndex;
@@ -55,7 +40,7 @@ class CustomAdapter extends RecyclerView.Adapter <CustomAdapter.MovieHolder>{
     public MovieHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 
         View view;
-        if(i == R.layout.single_item){
+        if(i == TYPE_ITEM){
             view = LayoutInflater.from(viewGroup.getContext()).
                     inflate(R.layout.single_item,viewGroup, false);
         }
@@ -84,31 +69,15 @@ class CustomAdapter extends RecyclerView.Adapter <CustomAdapter.MovieHolder>{
                 }
             });
         }
-        else {
-            movieHolder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(pageIndex == 0) {
-                        topRatedPage++;
-                    }
-                    else if(pageIndex == 1) {
-                        popularPage++;
-                    }
-                    CustomEvents customEvents = new CustomEvents();
-                    GlobalBus.getBus().post(customEvents);
-
-                }
-            });
-        }
     }
 
     @Override
     public int getItemViewType(int position) {
         if (pageIndex == 2) {
-            return R.layout.single_item;
+            return TYPE_ITEM;
         }
         else {
-            return (position == movies.size()) ? R.layout.button : R.layout.single_item;
+            return (position == movies.size()) ? TYPE_FOOTER : TYPE_ITEM;
         }
     }
 

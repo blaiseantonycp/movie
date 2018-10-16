@@ -10,14 +10,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
 
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.fragment.SlidePageFragment;
-import com.qburst.blaise.movie.models.CustomEvents;
-import com.qburst.blaise.movie.models.GlobalBus;
-
-import org.greenrobot.eventbus.Subscribe;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        GlobalBus.getBus().register(this);
 
         pref = this.getSharedPreferences("Fav",MODE_PRIVATE);
 
@@ -64,19 +59,38 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                int c = currentTab;
-                viewPager.setAdapter(v);
-                viewPager.setCurrentItem(c);
+                refresh();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
 
     }
-    @Subscribe
-    public void refreshPage(CustomEvents customEvents) {
+
+    private void refresh(){
         int c = currentTab;
         viewPager.setAdapter(v);
         viewPager.setCurrentItem(c);
+    }
+
+    public void next(View view) {
+        if(currentTab == 0) {
+            topRatedPage++;
+        }
+        else if(currentTab == 1) {
+            popularPage++;
+        }
+        refresh();
+    }
+
+    public void previous(View view) {
+        if(currentTab == 0 && topRatedPage > 1) {
+            topRatedPage--;
+            refresh();
+        }
+        else if(currentTab == 1 && popularPage > 1) {
+            popularPage--;
+            refresh();
+        }
     }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.models.Movie;
@@ -25,6 +26,8 @@ import retrofit2.Response;
 
 import static com.qburst.blaise.movie.activity.MainActivity.popularPage;
 import static com.qburst.blaise.movie.activity.MainActivity.topRatedPage;
+import static com.qburst.blaise.movie.fragment.CustomAdapter.TYPE_FOOTER;
+import static com.qburst.blaise.movie.fragment.CustomAdapter.TYPE_ITEM;
 
 public class SlidePageFragment extends Fragment {
 
@@ -71,8 +74,22 @@ public class SlidePageFragment extends Fragment {
                 public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                     List<Movie> movies = response.body().getResults();
                     RecyclerView recyclerView = view.findViewById(R.id.recycler);
-                    recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
-                    CustomAdapter adapter = new CustomAdapter(getContext(),movies,i);
+                    final CustomAdapter adapter = new CustomAdapter(getContext(),movies,i);
+                    GridLayoutManager layout = new GridLayoutManager(getContext(),2);
+                    layout.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                                @Override
+                                public int getSpanSize(int i) {
+                                    switch(adapter.getItemViewType(i)){
+                                        case TYPE_FOOTER:
+                                            return 2;
+                                        case TYPE_ITEM:
+                                            return 1;
+                                        default:
+                                            return -1;
+                                    }
+                                }
+                            });
+                    recyclerView.setLayoutManager(layout);
                     recyclerView.setAdapter(adapter);
                 }
 
