@@ -14,6 +14,10 @@ import android.util.Log;
 
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.fragment.SlidePageFragment;
+import com.qburst.blaise.movie.models.CustomEvents;
+import com.qburst.blaise.movie.models.GlobalBus;
+
+import org.greenrobot.eventbus.Subscribe;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,13 +26,15 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ViewPagerAdapter v;
-    public static int topRatedPage;
-    public static int popularPage;
+    public static int topRatedPage = 1;
+    public static int popularPage = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        GlobalBus.getBus().register(this);
+
         pref = this.getSharedPreferences("Fav",MODE_PRIVATE);
 
         viewPager = findViewById(R.id.viewpager);
@@ -58,14 +64,16 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshPage();
+                int c = currentTab;
+                viewPager.setAdapter(v);
+                viewPager.setCurrentItem(c);
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
 
     }
-
-    public void refreshPage() {
+    @Subscribe
+    public void refreshPage(CustomEvents customEvents) {
         int c = currentTab;
         viewPager.setAdapter(v);
         viewPager.setCurrentItem(c);

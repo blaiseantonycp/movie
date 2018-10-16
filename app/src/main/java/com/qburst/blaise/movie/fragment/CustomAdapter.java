@@ -19,6 +19,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.activity.MainActivity;
 import com.qburst.blaise.movie.activity.MovieViewActivity;
+import com.qburst.blaise.movie.models.CustomEvents;
+import com.qburst.blaise.movie.models.GlobalBus;
 import com.qburst.blaise.movie.models.Movie;
 import com.qburst.blaise.movie.models.MovieResponse;
 import com.qburst.blaise.movie.network.ApiClient;
@@ -92,7 +94,9 @@ class CustomAdapter extends RecyclerView.Adapter <CustomAdapter.MovieHolder>{
                     else if(pageIndex == 1) {
                         popularPage++;
                     }
-                    new MainActivity().refreshPage();
+                    CustomEvents customEvents = new CustomEvents();
+                    GlobalBus.getBus().post(customEvents);
+
                 }
             });
         }
