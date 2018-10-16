@@ -53,7 +53,7 @@ public class FavouriteList {
                     if (i == favourite.size()) {
                         RecyclerView recyclerView = view.findViewById(R.id.recycler);
                         recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
-                        CustomAdapter adapter = new CustomAdapter(context, movies);
+                        CustomAdapter adapter = new CustomAdapter(context, movies,2);
                         recyclerView.setAdapter(adapter);
 
                     } else {

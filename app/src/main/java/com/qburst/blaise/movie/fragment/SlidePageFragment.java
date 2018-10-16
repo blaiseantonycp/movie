@@ -23,6 +23,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.qburst.blaise.movie.activity.MainActivity.popularPage;
+import static com.qburst.blaise.movie.activity.MainActivity.topRatedPage;
+
 public class SlidePageFragment extends Fragment {
 
     public static String API_KEY = "ff85648a7658698ee49eca272f7076a3";
@@ -48,7 +51,7 @@ public class SlidePageFragment extends Fragment {
         this.v = view;
         assert savedInstanceState != null;
         Bundle bundle = getArguments();
-        int i = bundle.getInt("position");
+        final int i = bundle.getInt("position");
         if (i == 2) {
             new FavouriteList().getFavouriteMovies(view, getContext());
         }
@@ -57,10 +60,10 @@ public class SlidePageFragment extends Fragment {
             Call<MovieResponse> call = null;
             switch (i) {
                 case 0:
-                    call = apiService.getTopRatedMovies(API_KEY);
+                    call = apiService.getTopRatedMovies(API_KEY,topRatedPage);
                     break;
                 case 1:
-                    call = apiService.getPopularMovies(API_KEY);
+                    call = apiService.getPopularMovies(API_KEY,popularPage);
                     break;
             }
             call.enqueue(new Callback<MovieResponse>() {
@@ -69,7 +72,7 @@ public class SlidePageFragment extends Fragment {
                     List<Movie> movies = response.body().getResults();
                     RecyclerView recyclerView = view.findViewById(R.id.recycler);
                     recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
-                    CustomAdapter adapter = new CustomAdapter(getContext(),movies);
+                    CustomAdapter adapter = new CustomAdapter(getContext(),movies,i);
                     recyclerView.setAdapter(adapter);
                 }
 

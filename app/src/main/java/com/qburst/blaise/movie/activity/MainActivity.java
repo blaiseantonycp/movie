@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ViewPagerAdapter v;
+    public static int topRatedPage;
+    public static int popularPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +58,17 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                int c = currentTab;
-                viewPager.setAdapter(v);
-                viewPager.setCurrentItem(c);
+                refreshPage();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
 
+    }
+
+    public void refreshPage() {
+        int c = currentTab;
+        viewPager.setAdapter(v);
+        viewPager.setCurrentItem(c);
     }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
