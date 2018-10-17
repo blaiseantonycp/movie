@@ -13,11 +13,13 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.qburst.blaise.movie.R;
+import com.qburst.blaise.movie.database.DatabaseHelper;
 import com.qburst.blaise.movie.models.Movie;
 import com.qburst.blaise.movie.network.ApiClient;
 import com.qburst.blaise.movie.network.ApiInterface;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import retrofit2.Call;
@@ -32,12 +34,13 @@ public class MovieViewActivity extends Activity {
     private String id;
     private ImageButton imageButton;
     private Set<String> favourite;
-
+    private DatabaseHelper db;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
+        db = new DatabaseHelper(this);
 
         imageButton = findViewById(R.id.imageButton2);
         favourite = pref.getStringSet("favSet",new HashSet<String>());
@@ -53,7 +56,8 @@ public class MovieViewActivity extends Activity {
                 Glide.with(MovieViewActivity.this).
                         load("http://image.tmdb.org/t/p/w300"+movie.getBackdropPath())
                         .apply(new RequestOptions()).into(imageView);
-                boolean fav = pref.getBoolean(id, false);
+                //boolean fav = pref.getBoolean(id, false);
+                boolean fav = db.isFavourite(id);
                 if(fav) {
                     imageButton.setImageDrawable(getResources().
                             getDrawable(android.R.drawable.star_big_on));
@@ -86,19 +90,21 @@ public class MovieViewActivity extends Activity {
 
     public void toggleFavButton(View view) {
         if(id != null) {
-            boolean fav = pref.getBoolean(String.valueOf(id), false);
+            //boolean fav = pref.getBoolean(id, false);
+            boolean fav = db.isFavourite(id);
             favourite = pref.getStringSet("favSet",new HashSet<String>());
             if(fav) {
                 imageButton.setImageDrawable(getResources().
                         getDrawable(android.R.drawable.star_big_off));
+                db.remove(id);
                 favourite.remove(id);
-                Log.e("hi", String.valueOf(favourite));
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putBoolean(id,false).apply();
             }
             else {
                 imageButton.setImageDrawable(getResources().
                         getDrawable(android.R.drawable.star_big_on));
+                db.insert(id);
                 favourite.add(id);
                 Log.e("hi", String.valueOf(favourite));
                 SharedPreferences.Editor editor = pref.edit();
