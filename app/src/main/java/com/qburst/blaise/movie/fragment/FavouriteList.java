@@ -61,6 +61,11 @@ public class FavouriteList {
                         RecyclerView recyclerView = view.findViewById(R.id.recycler);
                         recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
                         CustomAdapter adapter = new CustomAdapter(context, movies,2);
+                        adapter.setOnBottomReachedListener(new OnBottomReachedListener() {
+                            @Override
+                            public void onBottomReached(int k) {
+                            }
+                        });
                         recyclerView.setAdapter(adapter);
                     }
                 }

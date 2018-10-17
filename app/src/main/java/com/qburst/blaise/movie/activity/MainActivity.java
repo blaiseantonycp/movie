@@ -14,6 +14,10 @@ import android.view.View;
 
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.fragment.SlidePageFragment;
+import com.qburst.blaise.movie.models.Movie;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ViewPagerAdapter v;
+    public static List<Movie> topRatedMovies = new ArrayList<>();
+    public static List<Movie> popularMovies = new ArrayList<>();
     public static int topRatedPage = 1;
     public static int popularPage = 1;
 
@@ -70,27 +76,6 @@ public class MainActivity extends AppCompatActivity {
         int c = currentTab;
         viewPager.setAdapter(v);
         viewPager.setCurrentItem(c);
-    }
-
-    public void next(View view) {
-        if(currentTab == 0) {
-            topRatedPage++;
-        }
-        else if(currentTab == 1) {
-            popularPage++;
-        }
-        refresh();
-    }
-
-    public void previous(View view) {
-        if(currentTab == 0 && topRatedPage > 1) {
-            topRatedPage--;
-            refresh();
-        }
-        else if(currentTab == 1 && popularPage > 1) {
-            popularPage--;
-            refresh();
-        }
     }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {

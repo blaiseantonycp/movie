@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
 
 import com.qburst.blaise.movie.R;
 import com.qburst.blaise.movie.models.Movie;
@@ -18,16 +17,17 @@ import com.qburst.blaise.movie.models.MovieResponse;
 import com.qburst.blaise.movie.network.ApiClient;
 import com.qburst.blaise.movie.network.ApiInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.qburst.blaise.movie.activity.MainActivity.popularMovies;
 import static com.qburst.blaise.movie.activity.MainActivity.popularPage;
+import static com.qburst.blaise.movie.activity.MainActivity.topRatedMovies;
 import static com.qburst.blaise.movie.activity.MainActivity.topRatedPage;
-import static com.qburst.blaise.movie.fragment.CustomAdapter.TYPE_FOOTER;
-import static com.qburst.blaise.movie.fragment.CustomAdapter.TYPE_ITEM;
 
 public class SlidePageFragment extends Fragment {
 
@@ -44,7 +44,8 @@ public class SlidePageFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_movie,container,false);
     }
 
@@ -59,45 +60,57 @@ public class SlidePageFragment extends Fragment {
             new FavouriteList().getFavouriteMovies(view, getContext());
         }
         else {
-            ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-            Call<MovieResponse> call = null;
-            switch (i) {
-                case 0:
-                    call = apiService.getTopRatedMovies(API_KEY,topRatedPage);
-                    break;
-                case 1:
-                    call = apiService.getPopularMovies(API_KEY,popularPage);
-                    break;
-            }
-            call.enqueue(new Callback<MovieResponse>() {
-                @Override
-                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-                    List<Movie> movies = response.body().getResults();
-                    RecyclerView recyclerView = view.findViewById(R.id.recycler);
-                    final CustomAdapter adapter = new CustomAdapter(getContext(),movies,i);
-                    GridLayoutManager layout = new GridLayoutManager(getContext(),2);
-                    layout.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                                @Override
-                                public int getSpanSize(int i) {
-                                    switch(adapter.getItemViewType(i)){
-                                        case TYPE_FOOTER:
-                                            return 2;
-                                        case TYPE_ITEM:
-                                            return 1;
-                                        default:
-                                            return -1;
-                                    }
-                                }
-                            });
-                    recyclerView.setLayoutManager(layout);
-                    recyclerView.setAdapter(adapter);
-                }
-
-                @Override
-                public void onFailure(Call<MovieResponse> call, Throwable t) {
-                    Log.e("SlidePageFragment", "error");
-                }
-            });
+            setFragment(view,i,0);
         }
+    }
+
+    private void setFragment(final View view, final int i, final int position) {
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+        Call<MovieResponse> call = null;
+        switch (i) {
+            case 0:
+                call = apiService.getTopRatedMovies(API_KEY,topRatedPage);
+                break;
+            case 1:
+                call = apiService.getPopularMovies(API_KEY,popularPage);
+                break;
+        }
+        call.enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(Call<MovieResponse> call,
+                                   Response<MovieResponse> response) {
+                List<Movie> movie = response.body().getResults();
+                final List<Movie> movies = new ArrayList<>();
+                if(i == 0) {
+                    topRatedPage++;
+                    topRatedMovies.addAll(movie);
+                    movies.addAll(topRatedMovies);
+                }
+                else if(i == 1) {
+                    popularPage++;
+                    popularMovies.addAll(movie);
+                    movies.addAll(popularMovies);
+                }
+                RecyclerView recyclerView = view.findViewById(R.id.recycler);
+                CustomAdapter adapter = new CustomAdapter(getContext(),movies,i);
+                adapter.setOnBottomReachedListener(new OnBottomReachedListener() {
+                    @Override
+                    public void onBottomReached(int k) {
+                        if (k != 2) {
+                            setFragment(view, i,movies.size()-3);
+                        }
+                    }
+                });
+                GridLayoutManager layout = new GridLayoutManager(getContext(),2);
+                layout.scrollToPosition(position);
+                recyclerView.setLayoutManager(layout);
+                recyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<MovieResponse> call, Throwable t) {
+                Log.e("SlidePageFragment", "error");
+            }
+        });
     }
 }
