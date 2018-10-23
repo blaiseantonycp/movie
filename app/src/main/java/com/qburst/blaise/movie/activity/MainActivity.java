@@ -22,6 +22,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     public static SharedPreferences pref;
+    public static final int TYPE_FOOTER = 1;
+    public static final int TYPE_ITEM = 0;
     private int currentTab;
     private ViewPager viewPager;
     private SwipeRefreshLayout swipeRefreshLayout;

@@ -20,6 +20,8 @@ import com.qburst.blaise.movie.models.Movie;
 import java.util.List;
 
 import static android.support.v7.content.res.AppCompatResources.getDrawable;
+import static com.qburst.blaise.movie.activity.MainActivity.TYPE_FOOTER;
+import static com.qburst.blaise.movie.activity.MainActivity.TYPE_ITEM;
 
 class CustomAdapter extends RecyclerView.Adapter <CustomAdapter.MovieHolder>{
 
@@ -29,7 +31,6 @@ class CustomAdapter extends RecyclerView.Adapter <CustomAdapter.MovieHolder>{
     OnBottomReachedListener onBottomReachedListener;
 
     void setOnBottomReachedListener(OnBottomReachedListener onBottomReachedListener){
-
         this.onBottomReachedListener = onBottomReachedListener;
     }
 
@@ -42,33 +43,46 @@ class CustomAdapter extends RecyclerView.Adapter <CustomAdapter.MovieHolder>{
     @NonNull
     @Override
     public MovieHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new MovieHolder(LayoutInflater.from(viewGroup.getContext()).
-                inflate(R.layout.single_item,viewGroup, false));
+        if(i == TYPE_FOOTER) {
+            return new MovieHolder(LayoutInflater.from(viewGroup.getContext()).
+                    inflate(R.layout.loading,viewGroup, false));
+        }
+        else {
+            return new MovieHolder(LayoutInflater.from(viewGroup.getContext()).
+                    inflate(R.layout.single_item,viewGroup, false));
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (position == movies.size()) ? TYPE_FOOTER : TYPE_ITEM;
     }
 
     @Override
     public void onBindViewHolder(@NonNull MovieHolder movieHolder, int i) {
-        final int j = i;
-        movieHolder.textView.setText(movies.get(i).getTitle());
-        Glide.with(context).load("http://image.tmdb.org/t/p/w185" + movies.get(i).
-                getPosterPath()).apply(new RequestOptions().placeholder(getDrawable(context,
-                android.R.drawable.ic_menu_gallery))).into(movieHolder.imageView);
-        if(i == movies.size() - 1) {
-            onBottomReachedListener.onBottomReached(pageIndex);
-        }
-        movieHolder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, MovieViewActivity.class);
-                intent.putExtra("id", String.valueOf(movies.get(j).getId()));
-                context.startActivity(intent);
+        if(i < movies.size()) {
+            final int j = i;
+            movieHolder.textView.setText(movies.get(i).getTitle());
+            Glide.with(context).load("http://image.tmdb.org/t/p/w185" + movies.get(i).
+                    getPosterPath()).apply(new RequestOptions().placeholder(getDrawable(context,
+                    android.R.drawable.ic_menu_gallery))).into(movieHolder.imageView);
+            if (i == movies.size() - 1) {
+                onBottomReachedListener.onBottomReached(pageIndex);
             }
-        });
+            movieHolder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, MovieViewActivity.class);
+                    intent.putExtra("id", String.valueOf(movies.get(j).getId()));
+                    context.startActivity(intent);
+                }
+            });
+        }
     }
 
     @Override
     public int getItemCount() {
-        return movies.size();
+        return (pageIndex == 2) ? movies.size() : movies.size()+1;
     }
 
 

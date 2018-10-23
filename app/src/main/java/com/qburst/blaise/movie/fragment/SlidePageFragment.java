@@ -24,6 +24,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.qburst.blaise.movie.activity.MainActivity.TYPE_FOOTER;
+import static com.qburst.blaise.movie.activity.MainActivity.TYPE_ITEM;
 import static com.qburst.blaise.movie.activity.MainActivity.popularMovies;
 import static com.qburst.blaise.movie.activity.MainActivity.popularPage;
 import static com.qburst.blaise.movie.activity.MainActivity.topRatedMovies;
@@ -92,16 +94,29 @@ public class SlidePageFragment extends Fragment {
                     movies.addAll(popularMovies);
                 }
                 RecyclerView recyclerView = view.findViewById(R.id.recycler);
-                CustomAdapter adapter = new CustomAdapter(getContext(),movies,i);
+                final CustomAdapter adapter = new CustomAdapter(getContext(),movies,i);
                 adapter.setOnBottomReachedListener(new OnBottomReachedListener() {
                     @Override
                     public void onBottomReached(int k) {
                         if (k != 2) {
-                            setFragment(view, i,movies.size()-3);
+                            setFragment(view, i,movies.size()-1);
                         }
                     }
                 });
                 GridLayoutManager layout = new GridLayoutManager(getContext(),2);
+                layout.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                    @Override
+                    public int getSpanSize(int i) {
+                        switch(adapter.getItemViewType(i)){
+                            case TYPE_FOOTER:
+                                return 2;
+                            case TYPE_ITEM:
+                                return 1;
+                            default:
+                                return -1;
+                        }
+                    }
+                });
                 layout.scrollToPosition(position);
                 recyclerView.setLayoutManager(layout);
                 recyclerView.setAdapter(adapter);
